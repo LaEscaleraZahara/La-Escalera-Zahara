@@ -94,3 +94,17 @@ button:active,.button:active{transform:scale(.98)}
 .airbnb-wordmark{font-size:17px;font-weight:500;letter-spacing:0;color:#77736f;opacity:.78}
 .booking-card:not(.booking-direct) .airbnb-wordmark{transform:translateY(1px)}
 .booking-card:not(.booking-direct) .channel-wordmark{font-weight:500}
+
+/* Galería: detalle de senderos y entorno */
+.gallery-trail-note{max-width:1112px;margin:20px auto 0;padding:18px 24px;background:var(--white);border-left:3px solid var(--olive);color:var(--muted);font-size:13px}.gallery-trail-note strong{color:var(--olive-dark);margin-right:5px}.gallery-trail-note span{font-size:22px;color:var(--olive);vertical-align:middle;margin-right:8px}@media(max-width:700px){.gallery-trail-note{margin:16px 18px 0;padding:15px 16px}}
+
+/* Galería compacta del alojamiento: imágenes propias y vídeos bajo demanda */
+.gallery-video-area{max-width:var(--max);margin:34px auto 0;padding:0 34px}
+.gallery-video-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}
+.gallery-video-heading h3{font:500 clamp(23px,3vw,32px)/1.2 var(--serif);margin:7px 0 0}
+.gallery-video-heading .muted{max-width:360px;font-size:12px;line-height:1.7;margin:0 0 3px}
+.gallery-video-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.gallery-video-card{margin:0;min-width:0;background:#f0eee7}
+.gallery-video-card video{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#222}
+.gallery-video-card figcaption{padding:11px 14px;font-size:12px;color:var(--ink,#292b24)}
+@media(max-width:700px){.gallery-video-area{padding:0 20px;margin-top:26px}.gallery-video-heading{display:block}.gallery-video-heading .muted{margin-top:8px}.gallery-video-grid{grid-template-columns:1fr;gap:12px}}
