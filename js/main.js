@@ -87,6 +87,16 @@
       checkout.focus();
       return;
     }
+    const bedChecks = [...document.querySelectorAll('input[name="beds"]')];
+    const selectedBeds = bedChecks.filter(input => input.checked);
+    const bedCapacity = selectedBeds.reduce((total, input) => total + Number(input.dataset.capacity || 0), 0);
+    const guestCount = Number(document.querySelector('#guests')?.value || 1);
+    const bedStatus = document.querySelector('#bed-status');
+    if (!selectedBeds.length || bedCapacity < guestCount) {
+      if (status) status.textContent = 'Selecciona una combinación de camas suficiente para el número de huéspedes. La configuración actual no cubre todas las plazas.';
+      bedStatus?.focus?.();
+      return;
+    }
     if (!whatsappNumber || whatsappNumber.length < 10) {
       status.textContent = 'El teléfono de WhatsApp no está configurado correctamente. Revisa js/config.js.';
       return;
@@ -98,6 +108,7 @@
       `Fecha de entrada: ${formatDate(data.get('checkin'))}`,
       `Fecha de salida: ${formatDate(data.get('checkout'))}`,
       `Número de huéspedes: ${data.get('guests')}`,
+      `Camas solicitadas: ${(data.getAll('beds').length ? data.getAll('beds').join(', ') : 'por confirmar')}`,
       data.get('name')?.trim() ? `Nombre: ${data.get('name').trim()}` : '',
       data.get('message')?.trim() ? `Mensaje adicional: ${data.get('message').trim()}` : '',
       '',
@@ -115,15 +126,18 @@
   const lightboxImage = document.querySelector('#lightbox-image');
   const caption = document.querySelector('#lightbox-caption');
   let current = 0;
+  const visibleTiles = () => tiles.filter(tile => !tile.hidden);
   function showImage(index) {
-    if (!tiles.length) return;
-    current = (index + tiles.length) % tiles.length;
-    const tile = tiles[current];
+    const available = visibleTiles();
+    if (!available.length) return;
+    current = (index + available.length) % available.length;
+    const tile = available[current];
     lightboxImage.src = tile.dataset.full;
     lightboxImage.alt = tile.querySelector('img')?.alt || '';
     caption.textContent = tile.dataset.caption || '';
   }
-  tiles.forEach((tile, index) => tile.addEventListener('click', () => {
+  tiles.forEach(tile => tile.addEventListener('click', () => {
+    const index = visibleTiles().indexOf(tile);
     showImage(index);
     if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
   }));
@@ -135,6 +149,67 @@
     if (event.key === 'ArrowLeft') showImage(current - 1);
     if (event.key === 'ArrowRight') showImage(current + 1);
   });
+
+  // Gallery categories keep the layout compact and let visitors switch between the flat and the village.
+  const galleryFilters = [...document.querySelectorAll('[data-gallery-filter]')];
+  galleryFilters.forEach(button => button.addEventListener('click', () => {
+    const category = button.dataset.galleryFilter;
+    galleryFilters.forEach(filter => {
+      const active = filter === button;
+      filter.classList.toggle('is-active', active);
+      filter.setAttribute('aria-pressed', String(active));
+    });
+    tiles.forEach(tile => { tile.hidden = tile.dataset.category !== category; });
+  }));
+  tiles.forEach(tile => { tile.hidden = tile.dataset.category !== 'alojamiento'; });
+
+  // Bed selector: only allow an additional bed group when the current selection cannot fit the guests.
+  const guestSelect = document.querySelector('#guests');
+  const bedInputs = [...document.querySelectorAll('input[name="beds"]')];
+  const bedStatus = document.querySelector('#bed-status');
+  function updateBedStatus() {
+    if (!guestSelect || !bedInputs.length || !bedStatus) return;
+    const guests = Number(guestSelect.value || 1);
+    const selected = bedInputs.filter(input => input.checked);
+    const capacity = selected.reduce((total, input) => total + Number(input.dataset.capacity || 0), 0);
+    const totalCapacity = bedInputs.reduce((total, input) => total + Number(input.dataset.capacity || 0), 0);
+    bedInputs.forEach(input => {
+      if (input.checked) { input.disabled = false; return; }
+      const currentCanFit = capacity >= guests;
+      input.disabled = currentCanFit;
+    });
+    if (!selected.length) {
+      bedStatus.textContent = 'Selecciona al menos una opción de cama.';
+      bedStatus.dataset.state = 'invalid';
+    } else if (guests > totalCapacity) {
+      bedStatus.textContent = `La distribución indicada permite seleccionar hasta ${totalCapacity} plazas. Para ${guests} huéspedes, consulta otra configuración con el alojamiento.`;
+      bedStatus.dataset.state = 'invalid';
+    } else if (capacity < guests) {
+      bedStatus.textContent = `Las camas seleccionadas ofrecen ${capacity} plaza${capacity === 1 ? '' : 's'} para ${guests} huésped${guests === 1 ? '' : 'es'}. Añade otra opción para continuar.`;
+      bedStatus.dataset.state = 'invalid';
+    } else if (capacity > guests) {
+      bedStatus.textContent = `Hay ${capacity} plazas seleccionadas para ${guests} huésped${guests === 1 ? '' : 'es'}. Puedes desmarcar una opción si no necesitas todas esas camas.`;
+      bedStatus.dataset.state = 'notice';
+    } else {
+      bedStatus.textContent = `Configuración seleccionada: ${capacity} plaza${capacity === 1 ? '' : 's'} para ${guests} huésped${guests === 1 ? '' : 'es'}.`;
+      bedStatus.dataset.state = 'valid';
+    }
+  }
+  bedInputs.forEach(input => input.addEventListener('change', () => {
+    const guests = Number(guestSelect?.value || 1);
+    const otherSelected = bedInputs.filter(item => item !== input && item.checked);
+    const otherCapacity = otherSelected.reduce((total, item) => total + Number(item.dataset.capacity || 0), 0);
+    if (input.checked && otherCapacity >= guests) {
+      input.checked = false;
+      if (bedStatus) {
+        bedStatus.textContent = 'La selección actual ya tiene suficientes plazas. Desmarca una opción antes de elegir otra.';
+        bedStatus.dataset.state = 'notice';
+      }
+    }
+    updateBedStatus();
+  }));
+  guestSelect?.addEventListener('change', updateBedStatus);
+  updateBedStatus();
 
   // Calendar UI: no date is called available unless both authorized feeds synced successfully.
   const calendar = document.querySelector('#availability-calendar');
