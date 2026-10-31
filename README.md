@@ -83,8 +83,15 @@ No se pudo realizar una prueba real de importación de Booking.com/Airbnb porque
 
 ## Pulido visual añadido
 
-- Galería ampliada a seis fotografías reales del entorno de Zahara de la Sierra, con ampliación en lightbox, leyendas y fallback si una imagen externa falla.
+- Galería ampliada a ocho fotografías del entorno de Zahara de la Sierra (calles blancas, puerta histórica, panorámica del pueblo, vistas nocturnas y embalse), con ampliación en lightbox y leyendas. Las imágenes externas se sirven desde Wikimedia Commons; revisa la ficha individual de cada archivo para confirmar autoría y licencia.
 - Diseño de galería tipo editorial, mosaico adaptable a móvil, animaciones suaves y estados hover/focus accesibles.
 - Hero con mejor contraste, tipografía responsive, tarjetas con elevación sutil y CTA flotante para consultar la estancia.
 - Barra de progreso de lectura y soporte para `prefers-reduced-motion`.
 - Las fotografías corresponden al destino, no al interior del alojamiento. Conserva los créditos y consulta las licencias en las fichas enlazadas junto a la galería. Para máxima fiabilidad, descarga las imágenes autorizadas y sírvelas desde tu propio hosting.
+
+
+## Idiomas y galería del pueblo
+
+- Se ha añadido un selector de idioma con banderas en la parte superior del menú: español (predeterminado), inglés, alemán y francés. La preferencia elegida se guarda localmente en el navegador cuando el almacenamiento está disponible.
+- La interfaz traduce las secciones principales, la galería, las opciones de camas y partes relevantes de la consulta/reserva. Algunos textos dinámicos o información de terceros pueden seguir apareciendo en español si no tienen una traducción definida.
+- La galería mantiene las categorías «El alojamiento» y «Zahara y su entorno» para no saturar la página. Las fotos del pueblo se cargan desde Wikimedia Commons y requieren conexión a Internet.
