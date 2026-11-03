@@ -1,2 +1,4 @@
 # La web y el backend funcionan con la biblioteca estándar de Python 3.9+.
 # No hay dependencias externas obligatorias.
+
+gunicorn
