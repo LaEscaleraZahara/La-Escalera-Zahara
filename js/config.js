@@ -1,6 +1,7 @@
 /* Configuración central del sitio. Edita aquí los datos y enlaces oficiales. */
 window.SITE_CONFIG = {
   propertyName: 'La Escalera',
+  apiBase: 'https://la-escalera-calendar.onrender.com',
   whatsappNumber: '34645471761', // Formato internacional, solo dígitos
   bookingUrl: 'https://www.booking.com/hotel/es/la-escalera-zahara-de-la-sierra.es.html',
   airbnbUrl: 'https://www.airbnb.es/rooms/1451979739905839541',

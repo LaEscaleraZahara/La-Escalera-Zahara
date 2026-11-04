@@ -95,3 +95,17 @@ No se pudo realizar una prueba real de importación de Booking.com/Airbnb porque
 - Se ha añadido un selector de idioma con banderas en la parte superior del menú: español (predeterminado), inglés, alemán y francés. La preferencia elegida se guarda localmente en el navegador cuando el almacenamiento está disponible.
 - La interfaz traduce las secciones principales, la galería, las opciones de camas y partes relevantes de la consulta/reserva. Algunos textos dinámicos o información de terceros pueden seguir apareciendo en español si no tienen una traducción definida.
 - La galería mantiene las categorías «El alojamiento» y «Zahara y su entorno» para no saturar la página. Las fotos del pueblo se cargan desde Wikimedia Commons y requieren conexión a Internet.
+
+
+## Revisión responsive y accesibilidad (noviembre de 2026)
+
+- Se corrigió el marcado del encabezado principal para mantener un único `h1` válido y retirar el tamaño en línea.
+- Se reforzó la adaptación en 320, 375, 390, 768, 1024 y escritorio mediante reglas de anchura mínima, cuadrículas con `minmax(0, 1fr)`, tipografía fluida y ajustes específicos para móvil.
+- El menú móvil tiene un área táctil más amplia, límite de altura y desplazamiento interno para que sus enlaces y selector de idioma no queden fuera de pantalla.
+- Se ajustaron galería, tarjetas, formulario, vídeos, mapa y botón flotante para reducir desbordamientos y solapamientos; se respeta el área segura inferior de móviles.
+- Se reforzaron los indicadores de foco, tamaños táctiles y la preferencia de movimiento reducido.
+- Validación técnica realizada: JavaScript comprobado con `node --check`, CSS parseado sin errores y comprobación de IDs duplicados / encabezado principal. No fue posible ejecutar una prueba visual automatizada con Chromium en este entorno por bloqueo de navegación del navegador; conviene hacer una revisión final en dispositivos reales antes de publicar.
+
+## Auditoría técnica (4 de noviembre de 2026)
+
+Consulta [`AUDITORIA.md`](AUDITORIA.md) para ver los cambios de carga del hero y los vídeos, correcciones del HTML, fuentes/licencias de fotografías, pruebas ejecutadas y limitaciones verificadas. Las pruebas de regresión se ejecutan con `python -m unittest discover -s tests -v`. Las imágenes del entorno siguen en Wikimedia Commons porque el entorno de edición no tuvo conectividad saliente para descargarlas; la ficha y licencia de la fotografía nocturna quedan expresamente pendientes de verificación.

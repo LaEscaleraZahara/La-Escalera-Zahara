@@ -225,7 +225,7 @@
     const next = document.querySelector('#calendar-next');
     const now = new Date();
     let monthCursor = new Date(now.getFullYear(), now.getMonth(), 1);
-    let availability = { status: 'pending', busy: [], message: 'Disponibilidad pendiente de sincronización. Consulta las fechas por WhatsApp.' };
+    let availability = { status: 'pending', busy: [], message: '' };
     const dateString = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const parseDate = value => value ? new Date(`${value}T12:00:00`) : null;
     const formatDate = value => value ? new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(parseDate(value)) : '';
@@ -349,19 +349,21 @@
     });
     renderCalendar();
     updateSelectionMessage();
-    fetch('/api/availability', { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+    fetch(new URL('/api/availability', window.SITE_CONFIG?.apiBase || window.location.origin), { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
       .then(response => { if (!response.ok) throw new Error('API no disponible'); return response.json(); })
       .then(data => {
         if (!data || !['synced', 'degraded', 'pending'].includes(data.status) || !Array.isArray(data.busy)) throw new Error('Respuesta no válida');
         availability = data;
-        calendarStatus.textContent = data.message || 'Disponibilidad pendiente de sincronización. Consulta las fechas por WhatsApp.';
+        calendarStatus.textContent = data.status === 'synced' ? 'Calendario actualizado. La reserva se confirma con el alojamiento.' : data.status === 'degraded' ? 'No podemos confirmar todas las fechas en este momento. Consúltanos y lo revisamos contigo.' : '';
         calendarStatus.dataset.state = data.status;
+        calendarStatus.hidden = !calendarStatus.textContent;
         updateSelectionMessage();
       })
       .catch(() => {
-        availability = { status: 'pending', busy: [], message: 'Disponibilidad pendiente de sincronización. Consulta las fechas por WhatsApp.' };
-        calendarStatus.textContent = availability.message;
+        availability = { status: 'pending', busy: [], message: '' };
+        calendarStatus.textContent = 'No podemos verificar ahora todas las fechas. Consúltanos y te ayudaremos a confirmarlas.';
         calendarStatus.dataset.state = 'pending';
+        calendarStatus.hidden = false;
         updateSelectionMessage();
       });
   }

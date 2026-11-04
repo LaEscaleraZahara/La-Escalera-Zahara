@@ -224,7 +224,7 @@ def public_snapshot() -> dict:
         "last_successful_sync": min(successes) if all_fresh and successes else (max(successes) if successes else None),
         "sources": {name: {"configured": configured[name], "last_success": snapshot[name]["last_success"], "state": "ok" if fresh(name) else "stale" if snapshot[name]["last_success"] else "pending"} for name in state},
         "refresh_minutes": INTERVAL_MIN,
-        "message": "Fechas ocupadas importadas; confirma siempre con el alojamiento." if status == "synced" else "Disponibilidad pendiente de sincronización. Consulta las fechas por WhatsApp." if status == "pending" else "Sincronización parcial o temporalmente desactualizada. Consulta las fechas por WhatsApp.",
+        "message": "Calendario actualizado. La reserva se confirma con el alojamiento." if status == "synced" else "" if status == "pending" else "No podemos confirmar todas las fechas en este momento. Consúltanos y lo revisamos contigo.",
     }
 
 
@@ -241,11 +241,21 @@ def application(environ, start_response):
     method = environ.get("REQUEST_METHOD", "GET")
     if method != "GET":
         return _response(start_response, "405 Method Not Allowed", b'{"error":"method_not_allowed"}', headers=[("Allow", "GET")])
-    if path == "/api/availability":
-        return _response(start_response, "200 OK", json.dumps(public_snapshot(), ensure_ascii=False).encode(), headers=[("Cache-Control", "no-store")])
-    if path == "/api/health":
+    if path in {"/api/availability", "/api/health"}:
+        origin = environ.get("HTTP_ORIGIN", "")
+        allowed_origins = {
+            "https://laescalerazahara.es",
+            "https://www.laescalerazahara.es",
+            "https://laescalerazahara.github.io",
+            "https://la-escalera-calendar.onrender.com",
+        }
+        cors_headers = [("Vary", "Origin")]
+        if origin in allowed_origins:
+            cors_headers.append(("Access-Control-Allow-Origin", origin))
+        if path == "/api/availability":
+            return _response(start_response, "200 OK", json.dumps(public_snapshot(), ensure_ascii=False).encode(), headers=[("Cache-Control", "no-store"), *cors_headers])
         payload = {"ok": True, "service": "calendar-import", "status": public_snapshot()["status"]}
-        return _response(start_response, "200 OK", json.dumps(payload).encode(), headers=[("Cache-Control", "no-store")])
+        return _response(start_response, "200 OK", json.dumps(payload).encode(), headers=[("Cache-Control", "no-store"), *cors_headers])
     relative = "index.html" if path == "/" else unquote(path.lstrip("/"))
     target = (PROJECT_DIR / relative).resolve()
     if not target.is_relative_to(PROJECT_DIR) or not target.is_file():
