@@ -82,7 +82,7 @@
   }
 
   function setLanguage(language) {
-    currentLanguage = ['es', 'en', 'de', 'fr'].includes(language) ? language : 'es';
+    currentLanguage = ['es', 'en', 'de', 'fr', 'it', 'pt'].includes(language) ? language : 'es';
     document.documentElement.lang = currentLanguage;
     translateTree(document.body);
     try { localStorage.setItem('la-escalera-language', currentLanguage); } catch (_) { /* Storage may be unavailable. */ }
